@@ -29,6 +29,13 @@ namespace Whisperer.VirtualTerrain
             return new Vector3(worldX, y, worldZ);
         }
 
+        public bool IsWithinBounds(Vector3 position)
+        {
+            bool xWithin = position.x > transform.position.x && position.x < transform.position.x + _terrainSize.x;
+            bool zWithin = position.z > transform.position.z && position.z < transform.position.z + _terrainSize.z;
+            return xWithin && zWithin;
+        }
+
         public Vector3 ClampToTerrain(Vector3 point)
         {
             var x = transform.position.x;
@@ -37,6 +44,18 @@ namespace Whisperer.VirtualTerrain
             point.z = Mathf.Clamp(point.z, z, z + _terrainSize.z);
             return point;
         }
+
+        private void CreateTerrainGrid(int pointsPerUnit = 1)
+        {
+            int width = Mathf.CeilToInt(_terrainSize.x * pointsPerUnit);
+            int depth = Mathf.CeilToInt(_terrainSize.z * pointsPerUnit);
+
+            _grid = new float[width, depth];
+
+            BlendControlPoints();
+        }
+
+        private void GenerateGrassMesh() { }
 
         public void BlendControlPoints()
         {
@@ -62,16 +81,6 @@ namespace Whisperer.VirtualTerrain
                     _grid[x, z] = height;
                 }
             }
-        }
-
-        private void CreateTerrainGrid(int pointsPerUnit = 1)
-        {
-            int width = Mathf.CeilToInt(_terrainSize.x * pointsPerUnit);
-            int depth = Mathf.CeilToInt(_terrainSize.z * pointsPerUnit);
-
-            _grid = new float[width, depth];
-
-            BlendControlPoints();
         }
 
         public float GetHeightAt(Vector3 worldPosition)
@@ -113,14 +122,18 @@ namespace Whisperer.VirtualTerrain
             if (_grid == null)
                 return;
 
-            Gizmos.color = Color.white;
-            for (int x = 0; x < GridSize.x; x++)
+            Gizmos.color = Color.grey;
+
+            for (int z = 0; z < GridSize.z; z++)
             {
-                for (int z = 0; z < GridSize.z; z++)
+                for (int x = 0; x < GridSize.x; x++)
                 {
+                    if (x == 0) continue;
                     Vector3 terrainPoint = PointToWorld(x, _grid[x, z], z);
                     terrainPoint = transform.TransformPoint(terrainPoint);
-                    Gizmos.DrawCube(terrainPoint, GizmoSize.ToVector3());
+                    Vector3 prevPoint = PointToWorld(x - 1, _grid[x - 1, z], z);
+                    prevPoint = transform.TransformPoint(prevPoint);
+                    Gizmos.DrawLine(prevPoint, terrainPoint);
                 }
             }
         }
