@@ -1,5 +1,6 @@
 using UnityEngine;
 using Whisperer.VirtualTerrain;
+
 [ExecuteAlways]
 public class SnapToTerrain : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class SnapToTerrain : MonoBehaviour
         if (!_terrain) return;
         
         Vector3 pos = transform.position;
-        float y = _terrain.GetTerrainHeight(pos);
+        float y = _terrain.GetHeightAt(pos);
         pos = new Vector3(pos.x, y, pos.z);
         transform.position = _terrain.ClampToTerrain(pos);
     }

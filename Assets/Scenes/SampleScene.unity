@@ -363,7 +363,7 @@ GameObject:
   - component: {fileID: 794529430}
   - component: {fileID: 794529429}
   m_Layer: 0
-  m_Name: PseudoTerrain
+  m_Name: VirtualTerrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -381,12 +381,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca0439847563ac24bb0e357cc4fed5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsPerUnit: 2
+  _pointsPerUnit: 1
   _terrainSize:
     x: 50
     z: 10
   _controlPoints:
-  - _position: {x: 43.45634, y: 3.1853726, z: 5}
+  - _position: {x: 50, y: 6.843013, z: 2.3350096}
     _radius: 20
     _noiseStrength: 1
     _falloffCurve:
@@ -467,7 +467,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - _position: {x: 22.600399, y: -2.5484426, z: 0}
+  - _position: {x: 21.953434, y: -2.5484426, z: 0}
     _radius: 20
     _noiseStrength: 1
     _falloffCurve:
@@ -494,7 +494,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - _position: {x: 30.314638, y: 3.017274, z: 5}
+  - _position: {x: 30.145138, y: 3.017274, z: 5}
     _radius: 8.7
     _noiseStrength: 1
     _falloffCurve:
@@ -521,7 +521,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - _position: {x: 14.40793, y: 2.272791, z: 5}
+  - _position: {x: 15.017263, y: 2.798676, z: 5}
     _radius: 7.2
     _noiseStrength: 1
     _falloffCurve:
@@ -721,7 +721,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1681749626}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.71, y: 0.8650383, z: 2.85}
+  m_LocalPosition: {x: 30.41, y: 2.5993621, z: 4.83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
