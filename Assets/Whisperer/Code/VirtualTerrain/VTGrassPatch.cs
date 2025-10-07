@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Whisperer.VirtualTerrain
@@ -14,31 +12,43 @@ namespace Whisperer.VirtualTerrain
         [SerializeField] private float _minHeight = 0.25f;
         [SerializeField] private float _maxHeight = 1f;
         [SerializeField] private AnimationCurve _falloffCurve;
-        [SerializeField] private VTerrain _virtualTerrain;
+        [SerializeField] private VTerrain _vTerrain;
         [SerializeField] [Range(0.2f, 1)] private float _density = 1;
 
         private (Vector3, Vector3)[] _points;
         private Vector3 _prevPos;
 
-        private void GenerateLines(VTerrain terrain = null)
+        private void GenerateCircleSections(VTerrain terrain = null)
         {
-            float density = 1 / _density;//GameConfig.Instance.VTSettings.GrassLinesDensity;
+            terrain ??= _vTerrain;
+            float density = 1 / _density; // GameConfig.Instance.VTSettings.GrassLinesDensity;
             Vector3 position = transform.position;
             float startZ = position.z - _radius;
-            float startFraction = -density - startZ % density;
-            startZ += startFraction;
-            float remainingWidth = _radius + _radius - startFraction; // real width to divide;
+            float startOffset = -density - startZ % density;
+            startZ += startOffset;
+            float remainingWidth = _radius + _radius - startOffset; // real width to divide;
             int linesNum = Mathf.FloorToInt(remainingWidth / density);
 
             _points = new (Vector3, Vector3)[linesNum];
+
             for (int i = 0; i < linesNum; i++)
             {
-                float h = _radius - startFraction - (i + 1) * density;
-                float width = Mathf.Sqrt(_radius * _radius - h * h);
+                float densityOffset = (i + 1) * density;
+                float height = _radius - startOffset - densityOffset;
+                float width = Mathf.Sqrt(_radius * _radius - height * height);
+                float z = startZ + densityOffset;
 
-                Vector3 start = new Vector3(position.x - width, 0, startZ + density * (i + 1));
-                Vector3 end = new Vector3(position.x + width, 0, startZ + density * (i + 1));
-                Debug.Log($"point {start}, {end}");
+                Vector3 start = new Vector3(position.x - width, 0, z);
+                Vector3 end = new Vector3(position.x + width, 0, z);
+                
+                if (terrain != null)
+                {
+                    if (!terrain.AnyWithinBounds(start, end))
+                        continue;
+                    start = terrain.ClampToTerrain(start);
+                    end = terrain.ClampToTerrain(end);
+                }
+
                 _points[i] = (start, end);
             }
         }
@@ -54,21 +64,17 @@ namespace Whisperer.VirtualTerrain
         {
             if (_prevPos == transform.position) return;
             _prevPos = transform.position;
-            GenerateLines();
+            GenerateCircleSections();
         }
 
-        private void OnValidate()
-        {
-            GenerateLines();
-        }
+        private void OnValidate() => GenerateCircleSections();
 
         private void OnDrawGizmos()
         {
             if (_points == null)
-                GenerateLines();
+                GenerateCircleSections();
 
             Gizmos.color = Color.blue;
-            Debug.LogWarning($"points? {_points.Length}");
             for (int i = 0; i < _points?.Length; i++)
             {
                 var pt = _points[i];

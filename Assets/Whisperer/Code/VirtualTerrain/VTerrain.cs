@@ -34,11 +34,24 @@ namespace Whisperer.VirtualTerrain
             return new Vector3(worldX, y, worldZ);
         }
 
-        public bool IsWithinBounds(Vector3 position)
+        public bool IsWithinBounds(Vector3 position, float tolerance = 0.01f)
         {
-            bool xWithin = position.x > transform.position.x && position.x < transform.position.x + _terrainSize.x;
-            bool zWithin = position.z > transform.position.z && position.z < transform.position.z + _terrainSize.z;
+            var t = tolerance;
+            var pos = position;
+            var tp = transform.position;
+            bool xWithin = pos.x > tp.x - t && pos.x < tp.x + _terrainSize.x + t;
+            bool zWithin = pos.z > tp.z - t && pos.z < tp.z + _terrainSize.z + t;
             return xWithin && zWithin;
+        }
+
+        public bool AnyWithinBounds(params Vector3[] positions)
+        {
+            for(int i = 0; i < positions.Length; i++)
+            {
+                if (IsWithinBounds(positions[i]))
+                    return true;
+            }
+            return false;
         }
 
         public Vector3 ClampToTerrain(Vector3 point)
@@ -124,7 +137,7 @@ namespace Whisperer.VirtualTerrain
             return interpolatedHeight;
         }
 
-        private void OnValidate() => CreateTerrainGrid(GameConfig.Instance.VTSettings.PointsPerUnit);
+        private void OnValidate() => CreateTerrainGrid(_pointsPerUnit/*GameConfig.Instance.VTSettings.PointsPerUnit*/);
 
         private void OnDrawGizmos()
         {
