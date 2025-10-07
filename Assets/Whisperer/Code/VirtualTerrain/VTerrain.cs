@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Whisperer.VirtualTerrain
 {
@@ -55,7 +56,26 @@ namespace Whisperer.VirtualTerrain
             BlendControlPoints();
         }
 
-        private void GenerateGrassMesh() { }
+
+        private void GenerateGrassMesh() {
+            float lineDensity = 2;
+            float linesSpacing = 0.5f;
+            Vector3 pos = transform.position;
+            int linesNum = (int)(_terrainSize.z / linesSpacing);
+            int lineSegements = (int)(_terrainSize.x * lineDensity);
+
+            for (int line =0; line < linesNum; line++)
+            {
+                // initialize mesh
+                Mesh lineMesh = new Mesh();
+                List<Vector3> vertices = new List<Vector3>();
+                // create first 2 verts at start
+                for (int segment = 0; segment < lineSegements; segment++ )
+                {
+                    // create more verts and connect them to previous ones
+                }
+            }
+        }
 
         public void BlendControlPoints()
         {
@@ -85,6 +105,8 @@ namespace Whisperer.VirtualTerrain
 
         public float GetHeightAt(Vector3 worldPosition)
         {
+            if (_grid == null) return 0;
+
             Vector3 localPos = transform.InverseTransformPoint(worldPosition);
 
             // returns original position if out of terrain bounds
@@ -94,15 +116,19 @@ namespace Whisperer.VirtualTerrain
             float closestX = (localPos.x / _terrainSize.x) * (GridSize.x - 1);
             float closestZ = (localPos.z / _terrainSize.z) * (GridSize.z - 1);
 
-            int x0 = Mathf.FloorToInt(closestX);
+            // keep points in grid
+            int x0 = Mathf.Clamp(Mathf.FloorToInt(closestX), 0, GridSize.x - 1);
+            int z0 = Mathf.Clamp(Mathf.FloorToInt(closestZ), 0, GridSize.z - 1);
             int x1 = Mathf.Min(x0 + 1, GridSize.x - 1);
-            int z0 = Mathf.FloorToInt(closestZ);
             int z1 = Mathf.Min(z0 + 1, GridSize.z - 1);
 
             float deltaX = closestX - x0;
             float deltaZ = closestZ - z0;
 
-            float heightBL = _grid[x0, z0];
+            /*Debug.Log("grid: " + _grid.GetLength(0) + ", " + _grid.GetLength(1));
+            Debug.Log($"x0 {x0}, x0 {z0}, x1 {x1}, z1 {z1}");
+            */
+            float heightBL = _grid[x0, z0]; // NullReferenceException?
             float heightBR = _grid[x1, z0];
             float heightTL = _grid[x0, z1];
             float heightTR = _grid[x1, z1];

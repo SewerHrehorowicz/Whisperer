@@ -67,7 +67,7 @@ public class GrassPatch : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
-        for (int i =0; i < _quads.Length; i++)
+        for (int i =0; i < _quads?.Length; i++)
         {
             var quad = _quads[i];
             Gizmos.DrawCube(quad.Position, quad.Size);
