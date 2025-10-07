@@ -1,4 +1,5 @@
 using UnityEngine;
+using Whisperer.MeshHelpers;
 using Whisperer.VirtualTerrain;
 
 namespace Whisperer

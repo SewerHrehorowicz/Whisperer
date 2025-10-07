@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Whisperer
+namespace Whisperer.MeshHelpers
 {
     public static class Drawing
     {

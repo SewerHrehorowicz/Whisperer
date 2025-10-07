@@ -6,12 +6,10 @@ namespace Whisperer.VirtualTerrain
     [CustomEditor(typeof(VTerrain))]
     public class VTerrainEditor : Editor
     {
-        private void OnSceneGUI()
+        private VTerrain vTerrain => (VTerrain)target;
+
+        private void HandleShapeMode()
         {
-            VTerrain vTerrain = (VTerrain)target;
-
-            if (vTerrain.ControlPoints == null) return;
-
             for (int i = 0; i < vTerrain.ControlPoints.Length; i++)
             {
                 Vector3 worldPos = vTerrain.transform.TransformPoint(vTerrain.ControlPoints[i].Position);
@@ -24,6 +22,14 @@ namespace Whisperer.VirtualTerrain
                     vTerrain.BlendControlPoints();
                 }
             }
+        }
+
+        private void OnSceneGUI()
+        {
+            if (vTerrain.ControlPoints == null) return;
+
+            if (vTerrain.Mode == VTerrain.Modes.Shape)
+                HandleShapeMode();
         }
     }
 }

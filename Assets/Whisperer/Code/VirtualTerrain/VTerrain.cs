@@ -6,11 +6,13 @@ namespace Whisperer.VirtualTerrain
 {
     public class VTerrain : MonoBehaviour
     {
-        private static float GizmoSize = 0.1f;
+        public enum Modes { Shape, Grass }
 
         [SerializeField] private int _pointsPerUnit = 5;
         [SerializeField] private XZVector _terrainSize = new XZVector(10, 10);
         [SerializeField] private VTControlPoint[] _controlPoints;
+        [SerializeField] private GrassMesh[] _grassMeshes;
+        [SerializeField] private Modes _mode;
 
         private float[,] _grid;
 
@@ -21,6 +23,8 @@ namespace Whisperer.VirtualTerrain
 
         public VTControlPoint[] ControlPoints => _controlPoints;
         public XZVector TerrainSize => _terrainSize;
+
+        public Modes Mode => _mode;
 
         private Vector3 PointToWorld(float x, float y, float z)
         {
@@ -54,27 +58,6 @@ namespace Whisperer.VirtualTerrain
             _grid = new float[width, depth];
 
             BlendControlPoints();
-        }
-
-
-        private void GenerateGrassMesh() {
-            float lineDensity = 2;
-            float linesSpacing = 0.5f;
-            Vector3 pos = transform.position;
-            int linesNum = (int)(_terrainSize.z / linesSpacing);
-            int lineSegements = (int)(_terrainSize.x * lineDensity);
-
-            for (int line =0; line < linesNum; line++)
-            {
-                // initialize mesh
-                Mesh lineMesh = new Mesh();
-                List<Vector3> vertices = new List<Vector3>();
-                // create first 2 verts at start
-                for (int segment = 0; segment < lineSegements; segment++ )
-                {
-                    // create more verts and connect them to previous ones
-                }
-            }
         }
 
         public void BlendControlPoints()
@@ -141,7 +124,7 @@ namespace Whisperer.VirtualTerrain
             return interpolatedHeight;
         }
 
-        private void OnValidate() => CreateTerrainGrid(_pointsPerUnit);
+        private void OnValidate() => CreateTerrainGrid(GameConfig.Instance.VTSettings.PointsPerUnit);
 
         private void OnDrawGizmos()
         {
