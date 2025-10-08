@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Whisperer.MeshHelpers;
 
 namespace Whisperer.VirtualTerrain
 {
@@ -14,9 +15,68 @@ namespace Whisperer.VirtualTerrain
         [SerializeField] private AnimationCurve _falloffCurve;
         [SerializeField] private VTerrain _vTerrain;
         [SerializeField] [Range(0.2f, 1)] private float _density = 1;
+        //[SerializeField] MeshRenderer[]
 
-        private (Vector3, Vector3)[] _points;
+        private (Vector3, Vector3)[] _circleSections;
         private Vector3 _prevPos;
+
+        // this is mess
+        private void ValidateChildren()
+        {
+            int children = transform.childCount;
+            int sections = _circleSections.Length;
+
+            if (children > 0)
+            {
+                for (int i = 0; i < children; i++)
+                {
+                    transform.GetChild(i).gameObject.SetActive(true);
+                }
+            }
+
+            if (children < sections)
+            {
+                int toAdd = sections - children;
+                for (int i = 0; i < toAdd; i++)
+                {
+                    Transform child = new GameObject("GrassLine").transform;
+                    child.parent = transform;
+                    child.localPosition = Vector3.zero;
+                    child.gameObject.AddComponent<MeshFilter>();
+                    child.gameObject.AddComponent<MeshRenderer>();
+                }
+            }
+
+            if (children > sections)
+            {
+                int toDisable = children - sections;
+                for (int i = 0; i < toDisable; i++)
+                {
+                    transform.GetChild(children - 1 + i).gameObject.SetActive(false);
+                }
+            }
+        }
+        private void DrawCircleMeshes(VTerrain terrain)
+        {
+            ValidateChildren();
+
+            // works properly so far
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Vector3 item1 = transform.InverseTransformPoint(_circleSections[i].Item1);
+                Vector3 item2 = transform.InverseTransformPoint(_circleSections[i].Item2);
+                Vector3[] line = Drawing.CreateLine(item1, item2, 1);
+
+                for (int j = 0; j < line.Length; j++)
+                {
+                    var pt = line[j];
+                    line[j].y = terrain.GetHeightAt(transform.TransformPoint(pt));
+                }
+
+                var mesh = Drawing.CreateLineMesh(line, 1, 1);
+                transform.GetChild(i).GetComponent<MeshFilter>().mesh = mesh;
+            }
+        }
 
         private void GenerateCircleSections(VTerrain terrain = null)
         {
@@ -28,8 +88,9 @@ namespace Whisperer.VirtualTerrain
             startZ += startOffset;
             float remainingWidth = _radius + _radius - startOffset; // real width to divide;
             int linesNum = Mathf.FloorToInt(remainingWidth / density);
+            bool hasTerrain = terrain != null;
 
-            _points = new (Vector3, Vector3)[linesNum];
+            _circleSections = new (Vector3, Vector3)[linesNum];
 
             for (int i = 0; i < linesNum; i++)
             {
@@ -40,8 +101,8 @@ namespace Whisperer.VirtualTerrain
 
                 Vector3 start = new Vector3(position.x - width, 0, z);
                 Vector3 end = new Vector3(position.x + width, 0, z);
-                
-                if (terrain != null)
+
+                if (hasTerrain)
                 {
                     if (!terrain.AnyWithinBounds(start, end))
                         continue;
@@ -49,8 +110,11 @@ namespace Whisperer.VirtualTerrain
                     end = terrain.ClampToTerrain(end);
                 }
 
-                _points[i] = (start, end);
+                _circleSections[i] = (start, end);
             }
+
+            if (hasTerrain)
+                DrawCircleMeshes(terrain);
         }
 
         public void SetPosition(Vector3 newPos, XZVector terrainSize)
@@ -71,13 +135,13 @@ namespace Whisperer.VirtualTerrain
 
         private void OnDrawGizmos()
         {
-            if (_points == null)
+            if (_circleSections == null)
                 GenerateCircleSections();
 
             Gizmos.color = Color.blue;
-            for (int i = 0; i < _points?.Length; i++)
+            for (int i = 0; i < _circleSections?.Length; i++)
             {
-                var pt = _points[i];
+                var pt = _circleSections[i];
                 Gizmos.DrawLine(pt.Item1, pt.Item2);
             }
 
