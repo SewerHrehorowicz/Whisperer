@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Whisperer.MeshHelpers;
 
@@ -6,7 +7,7 @@ namespace Whisperer.VirtualTerrain
 {
     [ExecuteAlways]
     [System.Serializable]
-    public class VTGrassPatch : MonoBehaviour
+    public class VTGrassPatch : MonoBehaviour, IPoolUser
     {
         [SerializeField] private Vector3 _position;
         [SerializeField] [Range(1, 20)] private float _radius = 10f;
@@ -20,61 +21,27 @@ namespace Whisperer.VirtualTerrain
         private (Vector3, Vector3)[] _circleSections;
         private Vector3 _prevPos;
 
-        // this is mess
-        private void ValidateChildren()
-        {
-            int children = transform.childCount;
-            int sections = _circleSections.Length;
+        public ObjectPool Pool => GameConfig.Instance.GrassLinesPool;
+        public List<GameObject> Borrowed { get; private set; }
 
-            if (children > 0)
-            {
-                for (int i = 0; i < children; i++)
-                {
-                    transform.GetChild(i).gameObject.SetActive(true);
-                }
-            }
-
-            if (children < sections)
-            {
-                int toAdd = sections - children;
-                for (int i = 0; i < toAdd; i++)
-                {
-                    Transform child = new GameObject("GrassLine").transform;
-                    child.parent = transform;
-                    child.localPosition = Vector3.zero;
-                    child.gameObject.AddComponent<MeshFilter>();
-                    child.gameObject.AddComponent<MeshRenderer>();
-                }
-            }
-
-            if (children > sections)
-            {
-                int toDisable = children - sections;
-                for (int i = 0; i < toDisable; i++)
-                {
-                    transform.GetChild(children - 1 + i).gameObject.SetActive(false);
-                }
-            }
-        }
         private void DrawCircleMeshes(VTerrain terrain)
         {
-            ValidateChildren();
-
-            // works properly so far
-            for (int i = 0; i < transform.childCount; i++)
+            Borrowed = Pool.Borrow(_circleSections.Length, this);
+            for (int i = 0; i < _circleSections.Length; i++)
             {
-                Vector3 item1 = transform.InverseTransformPoint(_circleSections[i].Item1);
-                Vector3 item2 = transform.InverseTransformPoint(_circleSections[i].Item2);
-                Vector3[] line = Drawing.CreateLine(item1, item2, 1);
+                (Vector3, Vector3) section = _circleSections[i];
+                Vector3 item1 = transform.InverseTransformPoint(section.Item1);
+                Vector3 item2 = transform.InverseTransformPoint(section.Item2);
+                Vector3[] line = Drawing.CreateLine(section.Item1, section.Item2, 1);
 
                 for (int j = 0; j < line.Length; j++)
                 {
                     var pt = line[j];
-                    line[j].y = terrain.GetHeightAt(transform.TransformPoint(pt));
+                    line[j].y = terrain.GetHeightAt(pt);
                 }
 
                 var mesh = Drawing.CreateLineMesh(line, 1, 1);
-                transform.GetChild(i).GetComponent<MeshFilter>().mesh = mesh;
+                Borrowed[i].GetComponent<MeshFilter>().mesh = mesh;
             }
         }
 

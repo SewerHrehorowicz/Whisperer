@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eab9cccd609907498b1fb158e337b7b, type: 3}
   m_Name: GameConfig
   m_EditorClassIdentifier: 
+  _grassLinesPool: {fileID: 3613270890248978614, guid: 61fc4e3a4627f2341a174b884d280b25, type: 3}
   _vtSettings:
     _pointsPerUnit: 1
     _grassMeshDensity: 1
