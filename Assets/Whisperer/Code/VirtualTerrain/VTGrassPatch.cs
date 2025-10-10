@@ -16,6 +16,7 @@ namespace Whisperer.VirtualTerrain
         [SerializeField] private AnimationCurve _falloffCurve;
         [SerializeField] private VTerrain _vTerrain;
         [SerializeField] [Range(0.2f, 1)] private float _density = 1;
+        [SerializeField] private float _minWidth = 0.5f;
         //[SerializeField] MeshRenderer[]
 
         private (Vector3, Vector3)[] _circleSections;
@@ -34,6 +35,7 @@ namespace Whisperer.VirtualTerrain
                 Vector3 item2 = transform.InverseTransformPoint(section.Item2);
                 Vector3[] line = Drawing.CreateLine(section.Item1, section.Item2, 1);
 
+                Debug.Log($"Line length for section {i} of {name}: {line.Length}");
                 for (int j = 0; j < line.Length; j++)
                 {
                     var pt = line[j];
@@ -75,6 +77,8 @@ namespace Whisperer.VirtualTerrain
                         continue;
                     start = terrain.ClampToTerrain(start);
                     end = terrain.ClampToTerrain(end);
+                    if (end.x - start.x < _minWidth)
+                        continue;
                 }
 
                 _circleSections[i] = (start, end);

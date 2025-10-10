@@ -10,6 +10,9 @@ namespace Whisperer.MeshHelpers
         {
             Vector3 dir = end - start;
             int points = Mathf.CeilToInt(dir.magnitude * density);
+            if (points < 2)
+                return new Vector3[] { start, end };
+
             Vector3[] line = new Vector3[points];
 
             for (int i = 0; i < points; i++)
