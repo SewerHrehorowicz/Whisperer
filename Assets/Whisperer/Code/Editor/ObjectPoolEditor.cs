@@ -18,7 +18,7 @@ namespace Whisperer
 
             if (GUILayout.Button("Reset"))
             {
-                Target.Clear();
+                Target.Reset();
             }
         }
     }

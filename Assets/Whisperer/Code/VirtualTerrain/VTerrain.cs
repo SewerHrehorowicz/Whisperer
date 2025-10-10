@@ -11,7 +11,6 @@ namespace Whisperer.VirtualTerrain
         [SerializeField] private int _pointsPerUnit = 5;
         [SerializeField] private XZVector _terrainSize = new XZVector(10, 10);
         [SerializeField] private VTControlPoint[] _controlPoints;
-        [SerializeField] private GrassMesh[] _grassMeshes;
         [SerializeField] private Modes _mode;
 
         private float[,] _grid;
