@@ -21,7 +21,7 @@ namespace Whisperer.VirtualTerrain
         private (Vector3, Vector3)[] _circleSections;
         private Vector3 _prevPos;
 
-        public ObjectPool Pool => GameConfig.Instance.GrassLinesPool;
+        public ObjectPool Pool => GameConfig.Instance.GrassPool;
         public List<GameObject> Borrowed { get; private set; }
 
         private void DrawCircleMeshes(VTerrain terrain)
@@ -30,8 +30,6 @@ namespace Whisperer.VirtualTerrain
             for (int i = 0; i < _circleSections.Length; i++)
             {
                 (Vector3, Vector3) section = _circleSections[i];
-                Vector3 item1 = transform.InverseTransformPoint(section.Item1);
-                Vector3 item2 = transform.InverseTransformPoint(section.Item2);
                 Vector3[] line = Drawing.CreateLine(section.Item1, section.Item2, 1);
 
                 Debug.Log($"Line length for section {i} of {name}: {line.Length}");
@@ -72,8 +70,8 @@ namespace Whisperer.VirtualTerrain
 
                 if (hasTerrain)
                 {
-                    if (!terrain.AnyWithinBounds(start, end))
-                        continue;
+                    /*if (!terrain.AnyWithinBounds(start, end))
+                        continue;*/
                     start = terrain.ClampToTerrain(start);
                     end = terrain.ClampToTerrain(end);
                     if (end.x - start.x < _minWidth)

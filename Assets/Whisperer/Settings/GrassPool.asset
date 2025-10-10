@@ -9,12 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2eab9cccd609907498b1fb158e337b7b, type: 3}
-  m_Name: GameConfig
+  m_Script: {fileID: 11500000, guid: 2f2aad5ef458dd341967df73a4f8361f, type: 3}
+  m_Name: GrassPool
   m_EditorClassIdentifier: 
-  _debugMode: 0
-  _grassPoolSettings: {fileID: 11400000, guid: cee536a3973ff904390f8ad905331261, type: 2}
-  _vtSettings:
-    _pointsPerUnit: 1
-    _grassMeshDensity: 1
-    _grassLinesDensity: 1
+  _maxItems: 200
+  _initialCount: 50
+  _objectPrefab: {fileID: 8732673111258237250, guid: 7285171453eff81429a14f68d2baf8e0, type: 3}
+  _maxReleasedIndices: 50

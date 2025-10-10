@@ -5,17 +5,33 @@ using UnityEngine;
 namespace Whisperer
 {
     [ExecuteAlways]
-    public class ObjectPool : MonoBehaviour
+    public class ObjectPool
     {
-        [SerializeField] private int _maxItems = 200;
-        [SerializeField] private int _initialCount = 50;
-        [SerializeField] private GameObject _objectPrefab;
-        [SerializeField] private MeshFilter _meshFilter;
-        [SerializeField] private int _maxReleasedIndices = 50;
+        [SerializeField] private ObjectPoolSettings _settings;
+        private string _name;
+        private Transform _transform;
 
-        [SerializeField] private GameObject[] _items;
-        [SerializeField] private int _tip;
-        [SerializeField] private int[] _releasedIndices;
+        private string ContainerName => $"Pool_{_name}_Container";
+
+        private Transform Transform
+        {
+            get
+            {
+                if (_transform == null)
+                {
+                    var go = new GameObject(ContainerName);
+                    bool debug = GameConfig.Instance.DebugMode;
+                    go.hideFlags = debug ? HideFlags.HideAndDontSave : HideFlags.DontSaveInEditor;
+                    _transform = go.transform;
+                }
+                return _transform;
+            }
+        }
+        //private int i;
+
+        private GameObject[] _items;
+        private int _tip;
+        private int[] _releasedIndices;
         private Dictionary<IPoolUser, List<GameObject>> _users = new();
 
         private int ItemsCount => _items == null ? 0 : _items.Length;
@@ -41,17 +57,17 @@ namespace Whisperer
 
         private void CreateBatch()
         {
-            int space = _maxItems - ItemsCount;
-            int batchSize = Mathf.Min(space, _initialCount);
+            int space = _settings.MaxItems - ItemsCount;
+            int batchSize = Mathf.Min(space, _settings.InitialCount);
 
             GameObject[] batch = new GameObject[batchSize];
 
             for (int i = 0; i < batchSize; i++)
             {
-                var go = Instantiate(_objectPrefab, transform);
-                go.transform.position = transform.position;
+                var go = GameObject.Instantiate(_settings.ObjectPrefab, Transform);
+                go.transform.position = Transform.position;
                 go.SetActive(false);
-                go.name = $"{_objectPrefab.name}_{i + ItemsCount}";
+                go.name = $"{_settings.ObjectPrefab.name}_{i + ItemsCount}";
                 batch[i] = go;
             }
 
@@ -122,9 +138,9 @@ namespace Whisperer
                 return GetItemFromIndex(freeIndex);
             }
 
-            if (_tip >= _maxItems - 1)
+            if (_tip >= _settings.MaxItems - 1)
             {
-                Debug.LogWarning($"{name}: pool capacity overflow!");
+                Debug.LogWarning($"{_name}: pool capacity overflow!");
                 return null;
             }
 
@@ -133,9 +149,9 @@ namespace Whisperer
 
         public void ReturnToPool(GameObject go)
         {
-            if (go.transform.parent != transform)
+            if (go.transform.parent != Transform)
             {
-                Debug.LogWarning($"Trying to return {go.name} to {name} pool, but it doesn't belong there");
+                Debug.LogWarning($"Trying to return {go.name} to {_name} pool, but it doesn't belong there");
                 return;
             }
 
@@ -144,6 +160,7 @@ namespace Whisperer
             ReleaseIndex(index);
         }
 
+        // if Transform is destroyed, it will throw error - trying to access GameObject that's been doestroyed
         public List<GameObject> BorrowItems(int count, IPoolUser user)
         {
             if (!_users.TryGetValue(user, out var items))
@@ -185,25 +202,59 @@ namespace Whisperer
         #region Events
         public void Reset()
         {
-            for (int i = _items.Length - 1; i >= 0; i--)
+            if (_items != null)
             {
-                DestroyImmediate(_items[i]);
+                for (int i = _items.Length - 1; i >= 0; i--)
+                {
+                    GameObject.DestroyImmediate(_items[i]);
+                }
             }
 
             _tip = 0;
-            _releasedIndices = InitializeAray(-1, _maxReleasedIndices);
+            _releasedIndices = InitializeAray(-1, _settings.MaxReleasedIndices);
             _items = null;
             _users.Clear();
         }
 
-        private void Awake() => Reset();
+        public ObjectPool(ObjectPoolSettings settings, string name)
+        {
+            _settings = settings;
+            _name = name;
+            Reset();
+        }
 
-        private void OnValidate() => transform.position = Vector3.zero;
+        public static ObjectPool Create(ObjectPoolSettings settings, string name)
+        {
+            bool noSettings = settings == null;
+            bool noName = string.IsNullOrEmpty(name);
+            if (noSettings || noName)
+            {
+                if (noName)
+                    Debug.LogError("No name passed for pool");
+                if (noSettings)
+                {
+                    string namePart = noName ? "" : " " + name;
+                    Debug.LogError($"No settings passed for{namePart} pool creation");
+                }
+
+                return null;
+            }
+            return new ObjectPool(settings, name);
+        }
+
+        private void Awake() => Reset();
 
         private void Update()
         {
-            if (transform.position != Vector3.zero)
-                transform.position = Vector3.zero;
+            if (Transform.position != Vector3.zero)
+                Transform.position = Vector3.zero;
+        }
+
+        public void Recompiled()
+        {
+            var go = GameObject.Find(ContainerName);
+            if (go)
+                GameObject.DestroyImmediate(go);
         }
         #endregion
     }

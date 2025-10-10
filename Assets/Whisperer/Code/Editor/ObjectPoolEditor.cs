@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Whisperer
 {
-    [CustomEditor(typeof(ObjectPool))]
+    /*[CustomEditor(typeof(ObjectPool))]
     public class ObjectPoolEditor : Editor
     {
         ObjectPool Target => target as ObjectPool;
@@ -21,5 +21,5 @@ namespace Whisperer
                 Target.Reset();
             }
         }
-    }
+    }*/
 }

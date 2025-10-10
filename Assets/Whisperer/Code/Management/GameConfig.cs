@@ -1,3 +1,6 @@
+#if UNITY_EDITOR
+using UnityEditor.Callbacks;
+#endif
 using UnityEngine;
 using Whisperer.VirtualTerrain;
 
@@ -6,29 +9,22 @@ namespace Whisperer
     [CreateAssetMenu(menuName = "Whisperer/" + nameof(GameConfig))]
     public class GameConfig : ScriptableObject
     {
-        [SerializeField] private ObjectPool _grassLinesPool;
+        [SerializeField] private bool _debugMode;
+        public bool DebugMode => _debugMode;
+
+        [SerializeField] private ObjectPoolSettings _grassPoolSettings;
         [SerializeField] private VTSettings _vtSettings;
 
-        private ObjectPool _grassLinesPoolInstance;
+        private ObjectPool _grassPoolInstance;
 
-        public ObjectPool GrassLinesPool
+        public ObjectPool GrassPool
         {
             get
             {
-                if (_grassLinesPoolInstance == null)
-                {
-                    _grassLinesPoolInstance = Instantiate(_grassLinesPool);
-                    _grassLinesPoolInstance.name = $"{_grassLinesPool.name}_Instance";
-                    _grassLinesPoolInstance.transform.position = Vector3.zero;
-                }
+                if (_grassPoolInstance == null)
+                    _grassPoolInstance = ObjectPool.Create(_grassPoolSettings, nameof(GrassPool));
                     
-                if (_grassLinesPoolInstance == null)
-                {
-                    Debug.LogError($"{nameof(GameConfig)} is missing {nameof(_grassLinesPool)} reference");
-                    return null;
-                }
-
-                return _grassLinesPoolInstance;
+                return _grassPoolInstance;
             }
         }
         public VTSettings VTSettings => _vtSettings;
@@ -48,5 +44,16 @@ namespace Whisperer
                 return _instance;
             }
         }
+
+#if UNITY_EDITOR
+        
+
+        [DidReloadScripts]
+        private static void OnScriptsReloaded()
+        {
+            if (Instance?.GrassPool != null)
+                Instance.GrassPool.Recompiled();
+        }
+#endif
     }
 }
