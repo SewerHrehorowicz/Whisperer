@@ -43,6 +43,20 @@ namespace Whisperer.VirtualTerrain
             return xWithin && zWithin;
         }
 
+        public bool LineWithinBounds(Vector3 start, Vector3 end, float tolerance = 0.01f)
+        {
+            var t = tolerance;
+            var tp = transform.position;
+            bool XWithin(Vector3 vec) => vec.x > tp.x - t && vec.x < tp.x + _terrainSize.x + t;
+            bool ZWithin(Vector3 vec) => vec.z > tp.z - t && vec.z < tp.z + _terrainSize.z + t;
+            bool anyZWithin = ZWithin(start) || ZWithin(end);
+            bool anyXWithin = XWithin(start) || XWithin(end);
+
+            bool XContained = start.x < tp.x && end.x > tp.x + _terrainSize.x;
+
+            return XContained && anyZWithin || anyXWithin && anyZWithin;
+        }
+
         public bool AnyWithinBounds(params Vector3[] positions)
         {
             for(int i = 0; i < positions.Length; i++)
