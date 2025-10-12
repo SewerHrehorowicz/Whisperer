@@ -2,9 +2,9 @@ using UnityEngine;
 
 namespace Whisperer.Pooling
 {
-    [CreateAssetMenu(menuName = "Whisperer/" + nameof(ObjectPoolSettings))]
+    [CreateAssetMenu(menuName = "Whisperer/" + nameof(GenericPoolSettings))]
     [System.Serializable]
-    public class ObjectPoolSettings : ScriptableObject
+    public class GenericPoolSettings : ScriptableObject
     {
         [SerializeField] private int _maxItems = 200;
         [SerializeField] private int _initialCount = 50;

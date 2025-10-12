@@ -270,12 +270,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca0439847563ac24bb0e357cc4fed5b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _pointsPerUnit: 1
-  _terrainSize:
-    x: 20
-    z: 40
+  _mode: 0
   _controlPoints:
-  - _position: {x: 20.304, y: 7.816467, z: 9.692982}
+  - _position: {x: 15.271674, y: 11.1448555, z: 11.423855}
     _radius: 11.6
     _noiseStrength: 1
     _falloffCurve:
@@ -311,7 +308,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - _position: {x: 8.013756, y: 3.4107742, z: 16.250431}
+  - _position: {x: 4.3441906, y: 3.6017113, z: 13.454613}
     _radius: 6.3
     _noiseStrength: 1
     _falloffCurve:
@@ -392,7 +389,7 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  - _position: {x: 24.277908, y: 6.144705, z: 20.048752}
+  - _position: {x: 20, y: 6.144705, z: 17.15408}
     _radius: 7.2
     _noiseStrength: 1
     _falloffCurve:
@@ -473,7 +470,12 @@ MonoBehaviour:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  _mode: 0
+  _grassPatches:
+  - {fileID: 896719469}
+  _pointsPerUnit: 1
+  _terrainSize:
+    x: 20
+    z: 40
 --- !u!4 &700676611
 Transform:
   m_ObjectHideFlags: 0
@@ -482,7 +484,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 700676609}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 58.78, y: 0, z: -30.75}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -515,7 +517,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 896719467}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.85, y: 0, z: 13.48}
+  m_LocalPosition: {x: 11, y: 0, z: 8.4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -534,7 +536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47400de6fc31f5c449ecbfc57c1a4153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _position: {x: 0, y: 0, z: 0}
+  _position: {x: 11.238092, y: 0, z: 6.2305984}
   _radius: 8.7
   _maxHeight: 2.8
   _falloffCurve:

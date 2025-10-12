@@ -1,3 +1,4 @@
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,18 +9,19 @@ namespace Whisperer.VirtualTerrain
     {
         private VTerrain vTerrain => (VTerrain)target;
 
-        private void HandleShapeMode()
+        private void CreateHandles<T>(T[] items, Action callback = null) where T : IVTerrainItem
         {
-            for (int i = 0; i < vTerrain.ControlPoints.Length; i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                Vector3 worldPos = vTerrain.transform.TransformPoint(vTerrain.ControlPoints[i].Position);
+                Vector3 worldPos = vTerrain.transform.TransformPoint(items[i].Position);
                 Vector3 newWorldPos = Handles.PositionHandle(worldPos, Quaternion.identity);
 
                 if (newWorldPos != worldPos)
                 {
                     Vector3 newLocalPos = vTerrain.transform.InverseTransformPoint(newWorldPos);
-                    vTerrain.ControlPoints[i].SetPosition(newLocalPos, vTerrain.TerrainSize);
-                    vTerrain.BlendControlPoints();
+                    items[i].SetPosition(newLocalPos, vTerrain.TerrainSize); // @todo no method, just set property
+                    if (callback != null)
+                        callback();
                 }
             }
         }
@@ -29,7 +31,9 @@ namespace Whisperer.VirtualTerrain
             if (vTerrain.ControlPoints == null) return;
 
             if (vTerrain.Mode == VTerrain.Modes.Shape)
-                HandleShapeMode();
+                CreateHandles(vTerrain.ControlPoints, () => vTerrain.BlendControlPoints());
+            if (vTerrain.Mode == VTerrain.Modes.Grass)
+                CreateHandles(vTerrain.GrassPatches);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Whisperer.Management
 {
     public static class GameState
     {
-        private static ObjectPool _grassPoolInstance;
+        private static GenericPool<MeshFilter> _grassPoolInstance;
 
-        public static ObjectPool GrassPool
+        public static GenericPool<MeshFilter> GrassPool
         {
             get
             {
@@ -23,7 +23,7 @@ namespace Whisperer.Management
                         Debug.LogError($"{nameof(GameConfig.GrassPoolSettings)} not found");
                         return null;
                     }
-                    _grassPoolInstance = ObjectPool.Create(GameConfig.Instance.GrassPoolSettings, nameof(GrassPool));
+                    _grassPoolInstance = GenericPool<MeshFilter>.Create<MeshFilter>(GameConfig.Instance.GrassPoolSettings, nameof(GrassPool));
                 }
 
                 return _grassPoolInstance;

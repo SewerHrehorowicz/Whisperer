@@ -5,9 +5,9 @@ using UnityEngine;
 namespace Whisperer.Pooling
 {
     [ExecuteAlways]
-    public class ObjectPool
+    public class GenericPool<T> where T: Component
     {
-        [SerializeField] private ObjectPoolSettings _settings;
+        [SerializeField] private GenericPoolSettings _settings;
         private string _name;
         private Transform _transform;
 
@@ -29,10 +29,10 @@ namespace Whisperer.Pooling
         }
         //private int i;
 
-        private GameObject[] _items;
+        private T[] _items;
         private int _tip;
         private int[] _releasedIndices;
-        private Dictionary<IPoolUser, List<GameObject>> _users = new();
+        private Dictionary<IGenericPoolUser<T>, List<T>> _users = new();
 
         private int ItemsCount => _items == null ? 0 : _items.Length;
 
@@ -60,7 +60,7 @@ namespace Whisperer.Pooling
             int space = _settings.MaxItems - ItemsCount;
             int batchSize = Mathf.Min(space, _settings.InitialCount);
 
-            GameObject[] batch = new GameObject[batchSize];
+            T[] batch = new T[batchSize];
 
             for (int i = 0; i < batchSize; i++)
             {
@@ -68,7 +68,8 @@ namespace Whisperer.Pooling
                 go.transform.position = Transform.position;
                 go.SetActive(false);
                 go.name = $"{_settings.ObjectPrefab.name}_{i + ItemsCount}";
-                batch[i] = go;
+                T item = go.GetComponent<T>();
+                batch[i] = item;
             }
 
             _items = _items == null ? batch : MergeArrays(_items, batch);
@@ -100,26 +101,26 @@ namespace Whisperer.Pooling
             }
         }
 
-        private GameObject GetItemFromIndex(int index)
+        private T GetItemFromIndex(int index)
         {
-            var go = _items[index];
-            go.SetActive(true);
-            return go;
+            var item = _items[index];
+            item.gameObject.SetActive(true);
+            return item;
         }
 
-        private int GetIndexOfItem(GameObject go)
+        private int GetIndexOfItem(T item)
         {
             for (int i = 0; i < _items.Length; i++)
             {
-                if (_items[i] == go)
+                if (_items[i] == item)
                     return i;
             }
             return -1;
         }
 
-        private List<GameObject> GetFromPool(int count)
+        private List<T> GetFromPool(int count)
         {
-            List<GameObject> items = new();
+            List<T> items = new();
             for (int i = 0; i < count; i++)
             {
                 items.Add(GetFromPool());
@@ -127,7 +128,7 @@ namespace Whisperer.Pooling
             return items;
         }
 
-        public GameObject GetFromPool()
+        public T GetFromPool()
         {
             int freeIndex = GetReleasedIndex();
             if (freeIndex == -1 && _tip >= ItemsCount)
@@ -147,21 +148,21 @@ namespace Whisperer.Pooling
             return GetItemFromIndex(_tip++);
         }
 
-        public void ReturnToPool(GameObject go)
+        public void ReturnToPool(T item)
         {
-            if (go.transform.parent != Transform)
+            if (item.transform.parent != Transform)
             {
-                Debug.LogWarning($"Trying to return {go.name} to {_name} pool, but it doesn't belong there");
+                Debug.LogWarning($"Trying to return {item.name} to {_name} pool, but it doesn't belong there");
                 return;
             }
 
-            go.SetActive(false);
-            int index = GetIndexOfItem(go);
+            item.gameObject.SetActive(false);
+            int index = GetIndexOfItem(item);
             ReleaseIndex(index);
         }
 
         // if Transform is destroyed, it will throw error - trying to access GameObject that's been doestroyed
-        public List<GameObject> BorrowItems(int count, IPoolUser user)
+        public List<T> BorrowItems(int count, IGenericPoolUser<T> user)
         {
             if (!_users.TryGetValue(user, out var items))
             {
@@ -189,7 +190,7 @@ namespace Whisperer.Pooling
             return items;
         }
 
-        public void ReleaseAll(IPoolUser user)
+        public void ReleaseAll(IGenericPoolUser<T> user)
         {
             if (_users.TryGetValue(user, out var items))
             {
@@ -216,14 +217,19 @@ namespace Whisperer.Pooling
             _users.Clear();
         }
 
-        public ObjectPool(ObjectPoolSettings settings, string name)
+        /// <summary>
+        /// Don't call it directly, use <see cref="Create{T}(GenericPoolSettings, string)"/>.
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="name"></param>
+        public GenericPool(GenericPoolSettings settings, string name)
         {
             _settings = settings;
             _name = name;
             Reset();
         }
 
-        public static ObjectPool Create(ObjectPoolSettings settings, string name)
+        public static GenericPool<T> Create<T>(GenericPoolSettings settings, string name) where T: Component
         {
             bool noSettings = settings == null;
             bool noName = string.IsNullOrEmpty(name);
@@ -239,7 +245,7 @@ namespace Whisperer.Pooling
 
                 return null;
             }
-            return new ObjectPool(settings, name);
+            return new GenericPool<T>(settings, name);
         }
 
         private void Awake() => Reset();

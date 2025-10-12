@@ -8,12 +8,12 @@ namespace Whisperer
     public class GameConfig : ScriptableObject
     {
         [SerializeField] private bool _debugMode;
-        [SerializeField] private ObjectPoolSettings _grassPoolSettings;
+        [SerializeField] private GenericPoolSettings _grassPoolSettings;
         [SerializeField] private VTSettings _vtSettings;
         private static GameConfig _instance;
 
         public bool DebugMode => _debugMode;
-        public ObjectPoolSettings GrassPoolSettings => _grassPoolSettings;
+        public GenericPoolSettings GrassPoolSettings => _grassPoolSettings;
         public VTSettings VTSettings => _vtSettings;
 
         public static GameConfig Instance

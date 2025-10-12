@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Whisperer.VirtualTerrain
 {
     [System.Serializable]
-    public class VTControlPoint
+    public class VTControlPoint : IVTerrainItem
     {
         [SerializeField] private Vector3 _position;
         [Range(1, 20f)] [SerializeField] private float _radius;

@@ -9,7 +9,7 @@ namespace Whisperer.VirtualTerrain
 {
     [ExecuteAlways]
     [Serializable]
-    public class VTGrassPatch : MonoBehaviour, IPoolUser
+    public class VTGrassPatch : MonoBehaviour, IGenericPoolUser<MeshFilter>, IVTerrainItem
     {
         [SerializeField] private Vector3 _position;
         [SerializeField] [Range(1, 20)] private float _radius = 10f;
@@ -23,8 +23,10 @@ namespace Whisperer.VirtualTerrain
         private List<(Vector3, Vector3)> _circleSections = new();
         private Vector3 _prevPos;
 
-        public ObjectPool Pool => GameState.GrassPool;
-        public List<GameObject> Borrowed { get; private set; }
+        public GenericPool<MeshFilter> Pool => GameState.GrassPool;
+        public List<MeshFilter> Borrowed { get; private set; }
+
+        public Vector3 Position => _position;
 
         private void DrawCircleMeshes(VTerrain terrain)
         {
@@ -43,7 +45,7 @@ namespace Whisperer.VirtualTerrain
                 float height = _falloffCurve.Evaluate((float)i / _circleSections.Count) * _maxHeight;
 
                 var mesh = Drawing.CreateLineMesh(line, height, 1, _falloffCurve);
-                Borrowed[i].GetComponent<MeshFilter>().mesh = mesh;
+                Borrowed[i].mesh = mesh;
             }
         }
 

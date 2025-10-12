@@ -7,10 +7,11 @@ namespace Whisperer.VirtualTerrain
     {
         public enum Modes { Shape, Grass }
 
+        [SerializeField] private Modes _mode;
+        [SerializeField] private VTControlPoint[] _controlPoints;
+        [SerializeField] private VTGrassPatch[] _grassPatches;
         [SerializeField] private int _pointsPerUnit = 5;
         [SerializeField] private XZVector _terrainSize = new XZVector(10, 10);
-        [SerializeField] private VTControlPoint[] _controlPoints;
-        [SerializeField] private Modes _mode;
 
         private float[,] _grid;
 
@@ -20,6 +21,7 @@ namespace Whisperer.VirtualTerrain
             : new XZVector(_grid.GetLength(0), _grid.GetLength(1));
 
         public VTControlPoint[] ControlPoints => _controlPoints;
+        public VTGrassPatch[] GrassPatches => _grassPatches;
         public XZVector TerrainSize => _terrainSize;
 
         public Modes Mode => _mode;
