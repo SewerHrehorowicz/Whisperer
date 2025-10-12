@@ -1,6 +1,5 @@
 using System.Linq;
 using UnityEngine;
-using System.Collections.Generic;
 
 namespace Whisperer.VirtualTerrain
 {
@@ -134,10 +133,7 @@ namespace Whisperer.VirtualTerrain
             float deltaX = closestX - x0;
             float deltaZ = closestZ - z0;
 
-            /*Debug.Log("grid: " + _grid.GetLength(0) + ", " + _grid.GetLength(1));
-            Debug.Log($"x0 {x0}, x0 {z0}, x1 {x1}, z1 {z1}");
-            */
-            float heightBL = _grid[x0, z0]; // NullReferenceException?
+            float heightBL = _grid[x0, z0];
             float heightBR = _grid[x1, z0];
             float heightTL = _grid[x0, z1];
             float heightTR = _grid[x1, z1];

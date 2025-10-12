@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Whisperer
+namespace Whisperer.Pooling
 {
     [ExecuteAlways]
     public class ObjectPool
@@ -250,6 +250,7 @@ namespace Whisperer
                 Transform.position = Vector3.zero;
         }
 
+        // clear old pools in case of recompiled scripts
         public void Recompiled()
         {
             var go = GameObject.Find(ContainerName);

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Whisperer
+namespace Whisperer.Pooling
 {
     public interface IPoolUser {
         public ObjectPool Pool { get; }

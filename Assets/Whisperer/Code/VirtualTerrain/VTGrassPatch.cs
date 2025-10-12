@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Whisperer.Management;
 using Whisperer.MeshHelpers;
+using Whisperer.Pooling;
 
 namespace Whisperer.VirtualTerrain
 {
@@ -21,7 +23,7 @@ namespace Whisperer.VirtualTerrain
         private List<(Vector3, Vector3)> _circleSections = new();
         private Vector3 _prevPos;
 
-        public ObjectPool Pool => GameConfig.Instance.GrassPool;
+        public ObjectPool Pool => GameState.GrassPool;
         public List<GameObject> Borrowed { get; private set; }
 
         private void DrawCircleMeshes(VTerrain terrain)
@@ -32,7 +34,6 @@ namespace Whisperer.VirtualTerrain
                 (Vector3, Vector3) section = _circleSections[i];
                 Vector3[] line = Drawing.CreateLine(section.Item1, section.Item2, _lineDensity);
 
-                Debug.Log($"Line length for section {i} of {name}: {line.Length}");
                 for (int j = 0; j < line.Length; j++)
                 {
                     var pt = line[j];

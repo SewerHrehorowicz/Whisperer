@@ -1,8 +1,6 @@
-#if UNITY_EDITOR
-using UnityEditor.Callbacks;
-#endif
 using UnityEngine;
 using Whisperer.VirtualTerrain;
+using Whisperer.Pooling;
 
 namespace Whisperer
 {
@@ -10,26 +8,14 @@ namespace Whisperer
     public class GameConfig : ScriptableObject
     {
         [SerializeField] private bool _debugMode;
-        public bool DebugMode => _debugMode;
-
         [SerializeField] private ObjectPoolSettings _grassPoolSettings;
         [SerializeField] private VTSettings _vtSettings;
+        private static GameConfig _instance;
 
-        private ObjectPool _grassPoolInstance;
-
-        public ObjectPool GrassPool
-        {
-            get
-            {
-                if (_grassPoolInstance == null)
-                    _grassPoolInstance = ObjectPool.Create(_grassPoolSettings, nameof(GrassPool));
-                    
-                return _grassPoolInstance;
-            }
-        }
+        public bool DebugMode => _debugMode;
+        public ObjectPoolSettings GrassPoolSettings => _grassPoolSettings;
         public VTSettings VTSettings => _vtSettings;
 
-        private static GameConfig _instance;
         public static GameConfig Instance
         {
             get
@@ -44,16 +30,5 @@ namespace Whisperer
                 return _instance;
             }
         }
-
-#if UNITY_EDITOR
-        
-
-        [DidReloadScripts]
-        private static void OnScriptsReloaded()
-        {
-            if (Instance?.GrassPool != null)
-                Instance.GrassPool.Recompiled();
-        }
-#endif
     }
 }
